@@ -13,14 +13,14 @@ const HeroSection = () => {
             מצאו את הנכס המושלם עבורכם
           </h1>
           <p className="text-lg md:text-xl mb-8 opacity-90">
-            ירון נכסים מציעה מגוון רחב של דירות, בתים ונכסים מסחריים למכירה ולהשכרה
+            ירון נכסים מתמחה בנכסים באזור המרכז - רמת גן וגבעתיים
           </p>
           
           <div className="bg-white rounded-lg p-4 shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="md:col-span-2">
                 <Input 
-                  placeholder="חיפוש לפי עיר, שכונה או רחוב" 
+                  placeholder="חיפוש ברמת גן או גבעתיים" 
                   className="w-full text-right text-gray-800" 
                 />
               </div>
