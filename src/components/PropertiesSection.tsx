@@ -30,6 +30,16 @@ const PropertiesSection = ({ filterType = "all" }: PropertiesSectionProps) => {
     setActiveTab(value as "all" | "sale" | "rent");
   };
 
+  const renderProperties = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {filterProperties().map((property) => (
+        <Link to={`/property/${property.id}`} key={property.id}>
+          <PropertyCard {...property} />
+        </Link>
+      ))}
+    </div>
+  );
+
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -50,33 +60,15 @@ const PropertiesSection = ({ filterType = "all" }: PropertiesSectionProps) => {
           </div>
           
           <TabsContent value="all" className="mt-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filterProperties().map((property) => (
-                <Link to={`/property/${property.id}`} key={property.id}>
-                  <PropertyCard {...property} />
-                </Link>
-              ))}
-            </div>
+            {renderProperties()}
           </TabsContent>
           
           <TabsContent value="sale" className="mt-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filterProperties().map((property) => (
-                <Link to={`/property/${property.id}`} key={property.id}>
-                  <PropertyCard {...property} />
-                </Link>
-              ))}
-            </div>
+            {renderProperties()}
           </TabsContent>
           
           <TabsContent value="rent" className="mt-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filterProperties().map((property) => (
-                <Link to={`/property/${property.id}`} key={property.id}>
-                  <PropertyCard {...property} />
-                </Link>
-              ))}
-            </div>
+            {renderProperties()}
           </TabsContent>
         </Tabs>
         
