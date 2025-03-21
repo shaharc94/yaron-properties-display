@@ -73,11 +73,21 @@ const PropertiesSection = ({ filterType = "all" }: PropertiesSectionProps) => {
         </Tabs>
         
         <div className="text-center mt-10">
-          <Button className="bg-realestate-primary hover:bg-realestate-dark" asChild>
-            {activeTab === "all" && <Link to="/sale">צפייה בכל הנכסים למכירה</Link>}
-            {activeTab === "sale" && <Link to="/rent">צפייה בנכסים להשכרה</Link>}
-            {activeTab === "rent" && <Link to="/sale">צפייה בנכסים למכירה</Link>}
-          </Button>
+          {activeTab === "all" && (
+            <Button className="bg-realestate-primary hover:bg-realestate-dark" asChild>
+              <Link to="/sale">צפייה בכל הנכסים למכירה</Link>
+            </Button>
+          )}
+          {activeTab === "sale" && (
+            <Button className="bg-realestate-primary hover:bg-realestate-dark" asChild>
+              <Link to="/rent">צפייה בנכסים להשכרה</Link>
+            </Button>
+          )}
+          {activeTab === "rent" && (
+            <Button className="bg-realestate-primary hover:bg-realestate-dark" asChild>
+              <Link to="/sale">צפייה בנכסים למכירה</Link>
+            </Button>
+          )}
         </div>
       </div>
     </section>

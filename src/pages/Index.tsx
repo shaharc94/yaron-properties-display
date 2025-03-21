@@ -11,7 +11,7 @@ const Index = () => {
       <Header />
       <main className="flex-grow">
         <HeroSection />
-        <PropertiesSection />
+        <PropertiesSection filterType="all" />
         <FeaturesSection />
       </main>
       <Footer />
