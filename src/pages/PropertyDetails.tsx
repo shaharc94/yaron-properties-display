@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, MapPin, Hotel, Bath, SquareFoot, Phone } from "lucide-react";
+import { Home, MapPin, Hotel, Bath, Square, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { properties } from "@/data/properties";
 
@@ -105,7 +105,7 @@ const PropertyDetails = () => {
                 
                 <div className="flex items-center justify-center p-4 bg-gray-50 rounded-lg">
                   <div className="text-center">
-                    <SquareFoot className="h-6 w-6 mx-auto mb-2 text-realestate-primary" />
+                    <Square className="h-6 w-6 mx-auto mb-2 text-realestate-primary" />
                     <p className="text-gray-900 font-semibold">{property.area} מ"ר</p>
                   </div>
                 </div>

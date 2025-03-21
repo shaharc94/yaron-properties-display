@@ -11,7 +11,7 @@ interface PropertiesSectionProps {
 }
 
 const PropertiesSection = ({ filterType = "all" }: PropertiesSectionProps) => {
-  const [activeTab, setActiveTab] = useState(filterType);
+  const [activeTab, setActiveTab] = useState<"all" | "sale" | "rent">(filterType);
   
   // Update active tab when filterType prop changes
   useEffect(() => {
@@ -25,6 +25,11 @@ const PropertiesSection = ({ filterType = "all" }: PropertiesSectionProps) => {
     return properties;
   };
 
+  // This handler ensures type safety
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as "all" | "sale" | "rent");
+  };
+
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -35,7 +40,7 @@ const PropertiesSection = ({ filterType = "all" }: PropertiesSectionProps) => {
           </p>
         </div>
         
-        <Tabs defaultValue={activeTab} className="mb-8" onValueChange={setActiveTab} value={activeTab}>
+        <Tabs defaultValue={activeTab} className="mb-8" onValueChange={handleTabChange} value={activeTab}>
           <div className="flex justify-center">
             <TabsList>
               <TabsTrigger value="all">כל הנכסים</TabsTrigger>
