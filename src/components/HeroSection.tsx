@@ -1,10 +1,29 @@
 
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+  const [searchLocation, setSearchLocation] = useState("");
+  const [propertyType, setPropertyType] = useState("");
+
+  const handleSearch = () => {
+    if (!searchLocation.trim()) {
+      toast.warning("אנא הזן מיקום לחיפוש");
+      return;
+    }
+    
+    // In a real app, this would search properties based on filters
+    // For now, we'll just redirect to the sale page
+    navigate("/sale");
+    toast.success("מחפש נכסים עבורך...");
+  };
+
   return (
     <section className="hero-pattern text-white py-20 md:py-32">
       <div className="container mx-auto px-4">
@@ -21,11 +40,13 @@ const HeroSection = () => {
               <div className="md:col-span-2">
                 <Input 
                   placeholder="חיפוש ברמת גן או גבעתיים" 
-                  className="w-full text-right text-gray-800" 
+                  className="w-full text-right text-gray-800"
+                  value={searchLocation}
+                  onChange={(e) => setSearchLocation(e.target.value)}
                 />
               </div>
               <div>
-                <Select>
+                <Select onValueChange={setPropertyType} value={propertyType}>
                   <SelectTrigger>
                     <SelectValue placeholder="סוג נכס" />
                   </SelectTrigger>
@@ -38,7 +59,10 @@ const HeroSection = () => {
                 </Select>
               </div>
               <div>
-                <Button className="w-full bg-realestate-primary hover:bg-realestate-dark">
+                <Button 
+                  className="w-full bg-realestate-primary hover:bg-realestate-dark"
+                  onClick={handleSearch}
+                >
                   <Search className="h-4 w-4 ml-2" />
                   חיפוש
                 </Button>

@@ -1,5 +1,6 @@
 
 import { MapPin, Phone, Mail, Instagram, Facebook, Twitter } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -26,6 +27,27 @@ const Footer = () => {
           </div>
           
           <div>
+            <h3 className="text-xl font-bold mb-4">ניווט מהיר</h3>
+            <ul className="space-y-2 text-right">
+              <li>
+                <Link to="/" className="text-gray-300 hover:text-white block">דף הבית</Link>
+              </li>
+              <li>
+                <Link to="/sale" className="text-gray-300 hover:text-white block">נכסים למכירה</Link>
+              </li>
+              <li>
+                <Link to="/rent" className="text-gray-300 hover:text-white block">נכסים להשכרה</Link>
+              </li>
+              <li>
+                <Link to="/about" className="text-gray-300 hover:text-white block">אודות</Link>
+              </li>
+              <li>
+                <Link to="/contact" className="text-gray-300 hover:text-white block">צור קשר</Link>
+              </li>
+            </ul>
+          </div>
+          
+          <div>
             <h3 className="text-xl font-bold mb-4">צור קשר</h3>
             <ul className="space-y-3">
               <li className="flex items-center">
@@ -41,24 +63,24 @@ const Footer = () => {
                 <span>info@yaronproperties.com</span>
               </li>
             </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-xl font-bold mb-4">שעות פעילות</h3>
-            <ul className="space-y-2">
-              <li className="flex justify-between">
-                <span>ראשון - חמישי</span>
-                <span>9:00 - 18:00</span>
-              </li>
-              <li className="flex justify-between">
-                <span>שישי</span>
-                <span>9:00 - 13:00</span>
-              </li>
-              <li className="flex justify-between">
-                <span>שבת</span>
-                <span>סגור</span>
-              </li>
-            </ul>
+            
+            <div className="mt-4">
+              <h4 className="text-lg font-bold mb-2">שעות פעילות</h4>
+              <ul className="space-y-1">
+                <li className="flex justify-between">
+                  <span>ראשון - חמישי</span>
+                  <span>9:00 - 18:00</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>שישי</span>
+                  <span>9:00 - 13:00</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>שבת</span>
+                  <span>סגור</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
         

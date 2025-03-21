@@ -1,38 +1,68 @@
 
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone } from "lucide-react";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex items-center">
-          <h1 className="text-2xl font-bold text-realestate-primary">ירון נכסים</h1>
+          <Link to="/">
+            <h1 className="text-2xl font-bold text-realestate-primary">ירון נכסים</h1>
+          </Link>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1 space-x-reverse">
-          <Button variant="link" className="text-realestate-dark hover:text-realestate-primary font-medium">
-            דף הבית
+          <Button 
+            variant="link" 
+            className={`font-medium ${isActive('/') ? 'text-realestate-primary' : 'text-realestate-dark hover:text-realestate-primary'}`}
+            asChild
+          >
+            <Link to="/">דף הבית</Link>
           </Button>
-          <Button variant="link" className="text-realestate-dark hover:text-realestate-primary font-medium">
-            נכסים למכירה
+          <Button 
+            variant="link" 
+            className={`font-medium ${isActive('/sale') ? 'text-realestate-primary' : 'text-realestate-dark hover:text-realestate-primary'}`}
+            asChild
+          >
+            <Link to="/sale">נכסים למכירה</Link>
           </Button>
-          <Button variant="link" className="text-realestate-dark hover:text-realestate-primary font-medium">
-            נכסים להשכרה
+          <Button 
+            variant="link" 
+            className={`font-medium ${isActive('/rent') ? 'text-realestate-primary' : 'text-realestate-dark hover:text-realestate-primary'}`}
+            asChild
+          >
+            <Link to="/rent">נכסים להשכרה</Link>
           </Button>
-          <Button variant="link" className="text-realestate-dark hover:text-realestate-primary font-medium">
-            אודות
+          <Button 
+            variant="link" 
+            className={`font-medium ${isActive('/about') ? 'text-realestate-primary' : 'text-realestate-dark hover:text-realestate-primary'}`}
+            asChild
+          >
+            <Link to="/about">אודות</Link>
           </Button>
-          <Button variant="link" className="text-realestate-dark hover:text-realestate-primary font-medium">
-            צור קשר
+          <Button 
+            variant="link" 
+            className={`font-medium ${isActive('/contact') ? 'text-realestate-primary' : 'text-realestate-dark hover:text-realestate-primary'}`}
+            asChild
+          >
+            <Link to="/contact">צור קשר</Link>
           </Button>
-          <Button className="bg-realestate-primary hover:bg-realestate-dark text-white mr-4">
-            <Phone className="h-4 w-4 ml-2" />
-            התקשרו עכשיו
+          <Button className="bg-realestate-primary hover:bg-realestate-dark text-white mr-4" asChild>
+            <Link to="/contact">
+              <Phone className="h-4 w-4 ml-2" />
+              התקשרו עכשיו
+            </Link>
           </Button>
         </nav>
 
@@ -51,24 +81,55 @@ const Header = () => {
       {isMenuOpen && (
         <nav className="md:hidden bg-white pb-4 px-4">
           <div className="flex flex-col space-y-2">
-            <Button variant="ghost" className="justify-start text-realestate-dark hover:text-realestate-primary font-medium">
-              דף הבית
+            <Button 
+              variant="ghost" 
+              className={`justify-start font-medium ${isActive('/') ? 'text-realestate-primary' : 'text-realestate-dark hover:text-realestate-primary'}`}
+              asChild
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Link to="/">דף הבית</Link>
             </Button>
-            <Button variant="ghost" className="justify-start text-realestate-dark hover:text-realestate-primary font-medium">
-              נכסים למכירה
+            <Button 
+              variant="ghost" 
+              className={`justify-start font-medium ${isActive('/sale') ? 'text-realestate-primary' : 'text-realestate-dark hover:text-realestate-primary'}`}
+              asChild
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Link to="/sale">נכסים למכירה</Link>
             </Button>
-            <Button variant="ghost" className="justify-start text-realestate-dark hover:text-realestate-primary font-medium">
-              נכסים להשכרה
+            <Button 
+              variant="ghost" 
+              className={`justify-start font-medium ${isActive('/rent') ? 'text-realestate-primary' : 'text-realestate-dark hover:text-realestate-primary'}`}
+              asChild
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Link to="/rent">נכסים להשכרה</Link>
             </Button>
-            <Button variant="ghost" className="justify-start text-realestate-dark hover:text-realestate-primary font-medium">
-              אודות
+            <Button 
+              variant="ghost" 
+              className={`justify-start font-medium ${isActive('/about') ? 'text-realestate-primary' : 'text-realestate-dark hover:text-realestate-primary'}`}
+              asChild
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Link to="/about">אודות</Link>
             </Button>
-            <Button variant="ghost" className="justify-start text-realestate-dark hover:text-realestate-primary font-medium">
-              צור קשר
+            <Button 
+              variant="ghost" 
+              className={`justify-start font-medium ${isActive('/contact') ? 'text-realestate-primary' : 'text-realestate-dark hover:text-realestate-primary'}`}
+              asChild
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Link to="/contact">צור קשר</Link>
             </Button>
-            <Button className="bg-realestate-primary hover:bg-realestate-dark text-white mt-2">
-              <Phone className="h-4 w-4 ml-2" />
-              התקשרו עכשיו
+            <Button 
+              className="bg-realestate-primary hover:bg-realestate-dark text-white mt-2"
+              asChild
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Link to="/contact">
+                <Phone className="h-4 w-4 ml-2" />
+                התקשרו עכשיו
+              </Link>
             </Button>
           </div>
         </nav>
