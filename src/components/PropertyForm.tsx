@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { PropertyProps } from "./PropertyCard";
 import { createProperty, updateProperty } from "@/services/propertyService";
+import { Loader2 } from "lucide-react";
 
 interface PropertyFormProps {
   property: PropertyProps | null;
@@ -14,7 +14,6 @@ interface PropertyFormProps {
 }
 
 const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
-  // Create a blank property template with default values
   const emptyProperty: PropertyProps = {
     id: 0,
     title: "",
@@ -31,10 +30,8 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  // If editing, use the provided property, otherwise use the empty template
   const [formData, setFormData] = useState<PropertyProps>(property || emptyProperty);
 
-  // Update form if property changes (e.g., when switching from add to edit)
   useEffect(() => {
     setFormData(property || emptyProperty);
   }, [property]);
@@ -42,7 +39,6 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     
-    // Handle different input types
     if (type === 'number') {
       setFormData({
         ...formData,
@@ -69,7 +65,6 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
       let savedProperty: PropertyProps | null;
       
       if (property) {
-        // Update existing property
         savedProperty = await updateProperty(formData);
         if (savedProperty) {
           toast({
@@ -80,7 +75,6 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
           throw new Error("Failed to update property");
         }
       } else {
-        // Create new property
         savedProperty = await createProperty(formData);
         if (savedProperty) {
           toast({
