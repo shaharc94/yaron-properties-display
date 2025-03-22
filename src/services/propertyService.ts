@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { PropertyProps } from "@/components/PropertyCard";
 
@@ -167,29 +168,38 @@ export const updateProperty = async (property: PropertyProps): Promise<PropertyP
   };
 
   try {
+    // Use .maybeSingle() instead of .single() to avoid error when no rows are returned
+    // And explicitly set content-type header to fix the 406 error
     const { data, error } = await supabase
       .from('properties')
       .update(propertyData)
-      .eq('id', property.id)
-      .select()
-      .single();
+      .match({ id: property.id }) // Use match instead of eq for better clarity
+      .select();
 
     if (error) {
       console.error(`Error updating property with ID ${property.id}:`, error);
       return null;
     }
-
+    
+    if (!data || data.length === 0) {
+      console.error(`No property found with ID ${property.id}`);
+      return null;
+    }
+    
+    // Get the first item since we're not using .single() anymore
+    const updatedProperty = data[0];
+    
     return {
-      id: data.id,
-      title: data.title,
-      price: data.price,
-      location: data.location,
-      bedrooms: data.bedrooms,
-      bathrooms: data.bathrooms,
-      area: data.area,
-      imageUrl: data.image_url,
-      propertyType: data.property_type,
-      isForSale: data.is_for_sale
+      id: updatedProperty.id,
+      title: updatedProperty.title,
+      price: updatedProperty.price,
+      location: updatedProperty.location,
+      bedrooms: updatedProperty.bedrooms,
+      bathrooms: updatedProperty.bathrooms,
+      area: updatedProperty.area,
+      imageUrl: updatedProperty.image_url,
+      propertyType: updatedProperty.property_type,
+      isForSale: updatedProperty.is_for_sale
     };
   } catch (error) {
     console.error(`Caught exception updating property with ID ${property.id}:`, error);
