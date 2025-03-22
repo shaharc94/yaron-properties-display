@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, X, Phone, Lock } from "lucide-react";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -62,6 +62,16 @@ const Header = () => {
             <Link to="/contact">
               <Phone className="h-4 w-4 ml-2" />
               התקשרו עכשיו
+            </Link>
+          </Button>
+          <Button 
+            variant="outline" 
+            className="border-realestate-primary text-realestate-primary hover:bg-realestate-primary hover:text-white" 
+            asChild
+          >
+            <Link to="/admin">
+              <Lock className="h-4 w-4 ml-2" />
+              ניהול
             </Link>
           </Button>
         </nav>
@@ -129,6 +139,17 @@ const Header = () => {
               <Link to="/contact">
                 <Phone className="h-4 w-4 ml-2" />
                 התקשרו עכשיו
+              </Link>
+            </Button>
+            <Button 
+              variant="outline" 
+              className="border-realestate-primary text-realestate-primary hover:bg-realestate-primary hover:text-white mt-2"
+              asChild
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Link to="/admin">
+                <Lock className="h-4 w-4 ml-2" />
+                ניהול
               </Link>
             </Button>
           </div>
