@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { PropertyProps } from "@/components/PropertyCard";
 
@@ -152,6 +151,9 @@ export const createProperty = async (property: PropertyData): Promise<PropertyPr
 
 // Update an existing property
 export const updateProperty = async (property: PropertyProps): Promise<PropertyProps | null> => {
+  console.log("Updating property with ID:", property.id);
+  console.log("Property data being sent:", property);
+
   const propertyData = {
     title: property.title,
     price: property.price,
@@ -164,30 +166,35 @@ export const updateProperty = async (property: PropertyProps): Promise<PropertyP
     is_for_sale: property.isForSale
   };
 
-  const { data, error } = await supabase
-    .from('properties')
-    .update(propertyData)
-    .eq('id', property.id)
-    .select()
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from('properties')
+      .update(propertyData)
+      .eq('id', property.id)
+      .select()
+      .single();
 
-  if (error) {
-    console.error(`Error updating property with ID ${property.id}:`, error);
+    if (error) {
+      console.error(`Error updating property with ID ${property.id}:`, error);
+      return null;
+    }
+
+    return {
+      id: data.id,
+      title: data.title,
+      price: data.price,
+      location: data.location,
+      bedrooms: data.bedrooms,
+      bathrooms: data.bathrooms,
+      area: data.area,
+      imageUrl: data.image_url,
+      propertyType: data.property_type,
+      isForSale: data.is_for_sale
+    };
+  } catch (error) {
+    console.error(`Caught exception updating property with ID ${property.id}:`, error);
     return null;
   }
-
-  return {
-    id: data.id,
-    title: data.title,
-    price: data.price,
-    location: data.location,
-    bedrooms: data.bedrooms,
-    bathrooms: data.bathrooms,
-    area: data.area,
-    imageUrl: data.image_url,
-    propertyType: data.property_type,
-    isForSale: data.is_for_sale
-  };
 };
 
 // Delete a property

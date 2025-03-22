@@ -44,7 +44,9 @@ const AdminProperties = () => {
   };
 
   const handleEdit = (property: PropertyProps) => {
-    setEditingProperty(property);
+    // Make sure we have a complete property object with ID
+    console.log("Editing property:", property);
+    setEditingProperty({...property});
     setIsFormOpen(true);
   };
 
@@ -76,8 +78,8 @@ const AdminProperties = () => {
   };
 
   const handleSave = async (property: PropertyProps) => {
-    // Saving will be handled by PropertyForm component
-    // We just need to refresh the properties list
+    console.log("Property saved:", property);
+    // Refresh properties list from database
     await loadProperties();
     setIsFormOpen(false);
   };

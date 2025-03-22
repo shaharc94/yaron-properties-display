@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,8 +65,14 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
     try {
       let savedProperty: PropertyProps | null;
       
-      if (property) {
-        savedProperty = await updateProperty(formData);
+      if (property && property.id) {
+        // Make sure we're sending the correct property ID
+        const propertyToUpdate = {
+          ...formData,
+          id: property.id
+        };
+        
+        savedProperty = await updateProperty(propertyToUpdate);
         if (savedProperty) {
           toast({
             title: "הנכס עודכן בהצלחה",
