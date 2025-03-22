@@ -4,7 +4,10 @@ import { Link } from "react-router-dom";
 import PropertyCard from "./PropertyCard";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { properties } from "@/data/properties";
+import { useToast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
+import { fetchProperties, fetchPropertiesForSale, fetchPropertiesForRent } from "@/services/propertyService";
+import { PropertyProps } from "@/components/PropertyCard";
 
 interface PropertiesSectionProps {
   filterType?: "all" | "sale" | "rent";
@@ -12,33 +15,81 @@ interface PropertiesSectionProps {
 
 const PropertiesSection = ({ filterType = "all" }: PropertiesSectionProps) => {
   const [activeTab, setActiveTab] = useState<"all" | "sale" | "rent">(filterType);
+  const [properties, setProperties] = useState<PropertyProps[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
   
   // Update active tab when filterType prop changes
   useEffect(() => {
     setActiveTab(filterType);
   }, [filterType]);
   
-  const filterProperties = () => {
-    if (activeTab === "all") return properties;
-    if (activeTab === "sale") return properties.filter(prop => prop.isForSale);
-    if (activeTab === "rent") return properties.filter(prop => !prop.isForSale);
-    return properties;
-  };
+  useEffect(() => {
+    const loadProperties = async () => {
+      setLoading(true);
+      try {
+        let data: PropertyProps[] = [];
+        
+        switch (activeTab) {
+          case "all":
+            data = await fetchProperties();
+            break;
+          case "sale":
+            data = await fetchPropertiesForSale();
+            break;
+          case "rent":
+            data = await fetchPropertiesForRent();
+            break;
+        }
+        
+        setProperties(data);
+      } catch (error) {
+        console.error("Failed to load properties:", error);
+        toast({
+          title: "שגיאה בטעינת הנכסים",
+          description: "לא ניתן לטעון את רשימת הנכסים כרגע. אנא נסה שוב מאוחר יותר.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadProperties();
+  }, [activeTab, toast]);
 
   // This handler ensures type safety
   const handleTabChange = (value: string) => {
     setActiveTab(value as "all" | "sale" | "rent");
   };
 
-  const renderProperties = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {filterProperties().map((property) => (
-        <Link to={`/property/${property.id}`} key={property.id}>
-          <PropertyCard {...property} />
-        </Link>
-      ))}
-    </div>
-  );
+  const renderProperties = () => {
+    if (loading) {
+      return (
+        <div className="flex justify-center items-center py-16">
+          <Loader2 className="h-8 w-8 animate-spin text-realestate-primary" />
+        </div>
+      );
+    }
+
+    if (properties.length === 0) {
+      return (
+        <div className="text-center py-16">
+          <p className="text-lg text-gray-600">לא נמצאו נכסים תואמים.</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {properties.map((property) => (
+          <Link to={`/property/${property.id}`} key={property.id}>
+            <PropertyCard {...property} />
+          </Link>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <section className="py-16 bg-gray-50">

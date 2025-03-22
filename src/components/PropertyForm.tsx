@@ -3,8 +3,9 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 import { PropertyProps } from "./PropertyCard";
+import { createProperty, updateProperty } from "@/services/propertyService";
 
 interface PropertyFormProps {
   property: PropertyProps | null;
@@ -26,6 +27,9 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
     propertyType: "",
     isForSale: true
   };
+
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
 
   // If editing, use the provided property, otherwise use the empty template
   const [formData, setFormData] = useState<PropertyProps>(property || emptyProperty);
@@ -57,9 +61,50 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    setLoading(true);
+    
+    try {
+      let savedProperty: PropertyProps | null;
+      
+      if (property) {
+        // Update existing property
+        savedProperty = await updateProperty(formData);
+        if (savedProperty) {
+          toast({
+            title: "הנכס עודכן בהצלחה",
+            description: "פרטי הנכס עודכנו בהצלחה במערכת",
+          });
+        } else {
+          throw new Error("Failed to update property");
+        }
+      } else {
+        // Create new property
+        savedProperty = await createProperty(formData);
+        if (savedProperty) {
+          toast({
+            title: "הנכס נוסף בהצלחה",
+            description: "הנכס החדש נוסף בהצלחה למערכת",
+          });
+        } else {
+          throw new Error("Failed to create property");
+        }
+      }
+      
+      if (savedProperty) {
+        onSave(savedProperty);
+      }
+    } catch (error) {
+      console.error("Error saving property:", error);
+      toast({
+        title: "שגיאה בשמירת הנכס",
+        description: "אירעה שגיאה בשמירת הנכס. אנא נסה שוב מאוחר יותר.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -194,14 +239,23 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
           type="button"
           variant="outline"
           onClick={onCancel}
+          disabled={loading}
         >
           ביטול
         </Button>
         <Button 
           type="submit"
           className="bg-realestate-primary hover:bg-realestate-dark"
+          disabled={loading}
         >
-          שמור
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              שומר...
+            </>
+          ) : (
+            'שמור'
+          )}
         </Button>
       </div>
     </form>

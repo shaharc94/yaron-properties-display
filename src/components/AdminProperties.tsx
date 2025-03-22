@@ -1,16 +1,42 @@
 
-import { useState } from "react";
-import { properties } from "@/data/properties";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import PropertyForm from "./PropertyForm";
 import { PropertyProps } from "./PropertyCard";
+import { fetchProperties, deleteProperty } from "@/services/propertyService";
 
 const AdminProperties = () => {
-  const [propertiesList, setPropertiesList] = useState([...properties]);
+  const [propertiesList, setPropertiesList] = useState<PropertyProps[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<PropertyProps | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  // Load properties from Supabase
+  const loadProperties = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchProperties();
+      setPropertiesList(data);
+    } catch (error) {
+      console.error("Failed to load properties:", error);
+      toast({
+        title: "שגיאה בטעינת הנכסים",
+        description: "לא ניתן לטעון את רשימת הנכסים כרגע. אנא נסה שוב מאוחר יותר.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProperties();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleAddNew = () => {
     setEditingProperty(null);
@@ -22,25 +48,45 @@ const AdminProperties = () => {
     setIsFormOpen(true);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     if (confirm("האם אתה בטוח שברצונך למחוק נכס זה?")) {
-      setPropertiesList(propertiesList.filter(property => property.id !== id));
-      // In a real app, this would also update the backend/database
+      try {
+        const success = await deleteProperty(id);
+        
+        if (success) {
+          setPropertiesList(propertiesList.filter(property => property.id !== id));
+          toast({
+            title: "הנכס נמחק בהצלחה",
+            description: "הנכס נמחק בהצלחה מהמערכת",
+          });
+        } else {
+          throw new Error("Failed to delete property");
+        }
+      } catch (error) {
+        console.error(`Error deleting property with ID ${id}:`, error);
+        toast({
+          title: "שגיאה במחיקת הנכס",
+          description: "לא ניתן למחוק את הנכס כרגע. אנא נסה שוב מאוחר יותר.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
-  const handleSave = (property: PropertyProps) => {
-    if (editingProperty) {
-      // Update existing property
-      setPropertiesList(propertiesList.map(p => p.id === property.id ? property : p));
-    } else {
-      // Add new property
-      const newId = Math.max(...propertiesList.map(p => p.id), 0) + 1;
-      setPropertiesList([...propertiesList, { ...property, id: newId }]);
-    }
+  const handleSave = async (property: PropertyProps) => {
+    // Saving will be handled by PropertyForm component
+    // We just need to refresh the properties list
+    await loadProperties();
     setIsFormOpen(false);
-    // In a real app, this would also update the backend/database
   };
+
+  if (loading && propertiesList.length === 0) {
+    return (
+      <div className="flex justify-center items-center py-16">
+        <Loader2 className="h-8 w-8 animate-spin text-realestate-primary" />
+      </div>
+    );
+  }
 
   return (
     <div>

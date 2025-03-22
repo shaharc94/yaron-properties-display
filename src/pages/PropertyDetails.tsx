@@ -1,15 +1,63 @@
 
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, MapPin, Hotel, Bath, Square, Phone } from "lucide-react";
+import { Home, MapPin, Hotel, Bath, Square, Phone, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { properties } from "@/data/properties";
+import { useToast } from "@/components/ui/use-toast";
+import { fetchPropertyById } from "@/services/propertyService";
+import { PropertyProps } from "@/components/PropertyCard";
 
 const PropertyDetails = () => {
   const { id } = useParams();
-  const property = properties.find(p => p.id === Number(id));
+  const [property, setProperty] = useState<PropertyProps | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    const loadProperty = async () => {
+      setLoading(true);
+      try {
+        if (id) {
+          const data = await fetchPropertyById(Number(id));
+          setProperty(data);
+          
+          if (!data) {
+            toast({
+              title: "הנכס לא נמצא",
+              description: "הנכס המבוקש לא נמצא במערכת",
+              variant: "destructive",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load property:", error);
+        toast({
+          title: "שגיאה בטעינת הנכס",
+          description: "לא ניתן לטעון את פרטי הנכס כרגע. אנא נסה שוב מאוחר יותר.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadProperty();
+  }, [id, toast]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow flex items-center justify-center">
+          <Loader2 className="h-12 w-12 animate-spin text-realestate-primary" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!property) {
     return (
@@ -20,7 +68,7 @@ const PropertyDetails = () => {
             <h1 className="text-3xl font-bold mb-4">הנכס לא נמצא</h1>
             <p className="mb-6">הנכס המבוקש אינו קיים במערכת</p>
             <Button className="bg-realestate-primary hover:bg-realestate-dark" asChild>
-              <a href="/">חזרה לדף הבית</a>
+              <Link to="/">חזרה לדף הבית</Link>
             </Button>
           </div>
         </main>
