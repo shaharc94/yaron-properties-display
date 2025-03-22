@@ -54,7 +54,9 @@ const AdminProperties = () => {
         const success = await deleteProperty(id);
         
         if (success) {
-          setPropertiesList(propertiesList.filter(property => property.id !== id));
+          // Refresh properties list from the database instead of filtering locally
+          await loadProperties();
+          
           toast({
             title: "הנכס נמחק בהצלחה",
             description: "הנכס נמחק בהצלחה מהמערכת",
