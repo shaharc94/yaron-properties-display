@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { PropertyProps } from "@/components/PropertyCard";
 
@@ -17,7 +16,6 @@ export const fetchProperties = async (): Promise<PropertyProps[]> => {
     throw error;
   }
 
-  // Transform data to match PropertyProps interface
   return data.map((item) => ({
     id: item.id,
     title: item.title,
@@ -173,52 +171,33 @@ export const updateProperty = async (property: PropertyProps): Promise<PropertyP
   };
 
   try {
-    // First check if the property exists
-    const { data: existingProperty, error: checkError } = await supabase
-      .from('properties')
-      .select('id')
-      .eq('id', property.id)
-      .maybeSingle();
-    
-    if (checkError) {
-      console.error(`Error checking property existence with ID ${property.id}:`, checkError);
-      return null;
-    }
-    
-    if (!existingProperty) {
-      console.error(`No property found with ID ${property.id}`);
-      return null;
-    }
-    
-    // Now perform the update since we know the property exists
     const { data, error } = await supabase
       .from('properties')
       .update(propertyData)
       .eq('id', property.id)
-      .select()
-      .maybeSingle();
+      .select();
 
     if (error) {
       console.error(`Error updating property with ID ${property.id}:`, error);
       return null;
     }
     
-    if (!data) {
-      console.error(`Failed to retrieve updated property with ID ${property.id}`);
+    if (!data || data.length === 0) {
+      console.error(`No data returned after updating property with ID ${property.id}`);
       return null;
     }
     
     return {
-      id: data.id,
-      title: data.title,
-      price: data.price,
-      location: data.location,
-      bedrooms: data.bedrooms,
-      bathrooms: data.bathrooms,
-      area: data.area,
-      imageUrl: data.image_url,
-      propertyType: data.property_type,
-      isForSale: data.is_for_sale
+      id: data[0].id,
+      title: data[0].title,
+      price: data[0].price,
+      location: data[0].location,
+      bedrooms: data[0].bedrooms,
+      bathrooms: data[0].bathrooms,
+      area: data[0].area,
+      imageUrl: data[0].image_url,
+      propertyType: data[0].property_type,
+      isForSale: data[0].is_for_sale
     };
   } catch (error) {
     console.error(`Caught exception updating property with ID ${property.id}:`, error);

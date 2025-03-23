@@ -45,9 +45,10 @@ const AdminProperties = () => {
   };
 
   const handleEdit = (property: PropertyProps) => {
-    // Make a deep copy of the property to avoid reference issues
+    // Create a deep copy of the property to avoid reference issues
     console.log("Editing property:", property);
-    setEditingProperty({...property});
+    const propertyCopy = JSON.parse(JSON.stringify(property)); // Deep copy
+    setEditingProperty(propertyCopy);
     setIsFormOpen(true);
   };
 

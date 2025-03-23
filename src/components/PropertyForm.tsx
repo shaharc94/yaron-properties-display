@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,7 +32,7 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState<PropertyProps>(property || emptyProperty);
+  const [formData, setFormData] = useState<PropertyProps>(property ? {...property} : {...emptyProperty});
 
   useEffect(() => {
     // Ensure we're working with a new object to avoid reference issues
@@ -85,6 +84,7 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
             title: "הנכס עודכן בהצלחה",
             description: "פרטי הנכס עודכנו בהצלחה במערכת",
           });
+          onSave(savedProperty);
         } else {
           throw new Error("Failed to update property");
         }
@@ -95,13 +95,10 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
             title: "הנכס נוסף בהצלחה",
             description: "הנכס החדש נוסף בהצלחה למערכת",
           });
+          onSave(savedProperty);
         } else {
           throw new Error("Failed to create property");
         }
-      }
-      
-      if (savedProperty) {
-        onSave(savedProperty);
       }
     } catch (error) {
       console.error("Error saving property:", error);
