@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -6,7 +5,7 @@ import { Pencil, Trash2, Plus, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import PropertyForm from "./PropertyForm";
 import { PropertyProps } from "./PropertyCard";
-import { fetchProperties, deleteProperty } from "@/services/propertyService";
+import { fetchProperties, deleteProperty } from "@/services/property";
 
 const AdminProperties = () => {
   const [propertiesList, setPropertiesList] = useState<PropertyProps[]>([]);
@@ -15,7 +14,6 @@ const AdminProperties = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Load properties from Supabase
   const loadProperties = async () => {
     setLoading(true);
     try {
@@ -45,7 +43,6 @@ const AdminProperties = () => {
   };
 
   const handleEdit = (property: PropertyProps) => {
-    // Create a deep copy of the property to avoid reference issues
     console.log("Editing property:", property);
     const propertyCopy = JSON.parse(JSON.stringify(property)); // Deep copy
     setEditingProperty(propertyCopy);
@@ -58,7 +55,6 @@ const AdminProperties = () => {
         const success = await deleteProperty(id);
         
         if (success) {
-          // Refresh properties list from the database
           await loadProperties();
           
           toast({
@@ -81,7 +77,6 @@ const AdminProperties = () => {
 
   const handleSave = async (property: PropertyProps) => {
     console.log("Property saved:", property);
-    // Refresh properties list from database
     await loadProperties();
     setIsFormOpen(false);
   };

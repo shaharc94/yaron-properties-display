@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
-import { fetchProperties, fetchPropertiesForSale, fetchPropertiesForRent } from "@/services/propertyService";
+import { fetchProperties, fetchPropertiesForSale, fetchPropertiesForRent } from "@/services/property";
 import { PropertyProps } from "@/components/PropertyCard";
 
 interface PropertiesSectionProps {

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { PropertyProps } from "../PropertyCard";
-import { createProperty, updateProperty } from "@/services/propertyService";
+import { createProperty, updateProperty } from "@/services/property";
 import PropertyFormHeader from "./PropertyFormHeader";
 import PropertyFormContent from "./PropertyFormContent";
 import PropertyFormActions from "./PropertyFormActions";
