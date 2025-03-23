@@ -20,6 +20,7 @@ const AdminProperties = () => {
     setLoading(true);
     try {
       const data = await fetchProperties();
+      console.log("Loaded properties:", data);
       setPropertiesList(data);
     } catch (error) {
       console.error("Failed to load properties:", error);
@@ -44,7 +45,7 @@ const AdminProperties = () => {
   };
 
   const handleEdit = (property: PropertyProps) => {
-    // Make sure we have a complete property object with ID
+    // Make a deep copy of the property to avoid reference issues
     console.log("Editing property:", property);
     setEditingProperty({...property});
     setIsFormOpen(true);
@@ -56,7 +57,7 @@ const AdminProperties = () => {
         const success = await deleteProperty(id);
         
         if (success) {
-          // Refresh properties list from the database instead of filtering locally
+          // Refresh properties list from the database
           await loadProperties();
           
           toast({

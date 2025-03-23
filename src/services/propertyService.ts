@@ -155,6 +155,11 @@ export const updateProperty = async (property: PropertyProps): Promise<PropertyP
   console.log("Updating property with ID:", property.id);
   console.log("Property data being sent:", property);
 
+  if (!property.id) {
+    console.error("Cannot update property: missing property ID");
+    return null;
+  }
+
   const propertyData = {
     title: property.title,
     price: property.price,
@@ -168,38 +173,52 @@ export const updateProperty = async (property: PropertyProps): Promise<PropertyP
   };
 
   try {
-    // Use .maybeSingle() instead of .single() to avoid error when no rows are returned
-    // And explicitly set content-type header to fix the 406 error
+    // First check if the property exists
+    const { data: existingProperty, error: checkError } = await supabase
+      .from('properties')
+      .select('id')
+      .eq('id', property.id)
+      .maybeSingle();
+    
+    if (checkError) {
+      console.error(`Error checking property existence with ID ${property.id}:`, checkError);
+      return null;
+    }
+    
+    if (!existingProperty) {
+      console.error(`No property found with ID ${property.id}`);
+      return null;
+    }
+    
+    // Now perform the update since we know the property exists
     const { data, error } = await supabase
       .from('properties')
       .update(propertyData)
-      .match({ id: property.id }) // Use match instead of eq for better clarity
-      .select();
+      .eq('id', property.id)
+      .select()
+      .maybeSingle();
 
     if (error) {
       console.error(`Error updating property with ID ${property.id}:`, error);
       return null;
     }
     
-    if (!data || data.length === 0) {
-      console.error(`No property found with ID ${property.id}`);
+    if (!data) {
+      console.error(`Failed to retrieve updated property with ID ${property.id}`);
       return null;
     }
     
-    // Get the first item since we're not using .single() anymore
-    const updatedProperty = data[0];
-    
     return {
-      id: updatedProperty.id,
-      title: updatedProperty.title,
-      price: updatedProperty.price,
-      location: updatedProperty.location,
-      bedrooms: updatedProperty.bedrooms,
-      bathrooms: updatedProperty.bathrooms,
-      area: updatedProperty.area,
-      imageUrl: updatedProperty.image_url,
-      propertyType: updatedProperty.property_type,
-      isForSale: updatedProperty.is_for_sale
+      id: data.id,
+      title: data.title,
+      price: data.price,
+      location: data.location,
+      bedrooms: data.bedrooms,
+      bathrooms: data.bathrooms,
+      area: data.area,
+      imageUrl: data.image_url,
+      propertyType: data.property_type,
+      isForSale: data.is_for_sale
     };
   } catch (error) {
     console.error(`Caught exception updating property with ID ${property.id}:`, error);

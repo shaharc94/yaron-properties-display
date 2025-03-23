@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { PropertyProps } from "./PropertyCard";
 import { createProperty, updateProperty } from "@/services/propertyService";
 import { Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface PropertyFormProps {
   property: PropertyProps | null;
@@ -30,11 +31,14 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
 
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<PropertyProps>(property || emptyProperty);
 
   useEffect(() => {
-    setFormData(property || emptyProperty);
+    // Ensure we're working with a new object to avoid reference issues
+    setFormData(property ? {...property} : {...emptyProperty});
+    setError(null);
   }, [property]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -61,18 +65,21 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     
     try {
       let savedProperty: PropertyProps | null;
       
       if (property && property.id) {
-        // Make sure we're sending the correct property ID
+        // Ensure we're sending the correct property ID
         const propertyToUpdate = {
           ...formData,
           id: property.id
         };
         
+        console.log("Sending property update with ID:", propertyToUpdate.id);
         savedProperty = await updateProperty(propertyToUpdate);
+        
         if (savedProperty) {
           toast({
             title: "הנכס עודכן בהצלחה",
@@ -98,6 +105,7 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
       }
     } catch (error) {
       console.error("Error saving property:", error);
+      setError("שגיאה בשמירת הנכס. אנא נסה שוב מאוחר יותר.");
       toast({
         title: "שגיאה בשמירת הנכס",
         description: "אירעה שגיאה בשמירת הנכס. אנא נסה שוב מאוחר יותר.",
@@ -113,6 +121,12 @@ const PropertyForm = ({ property, onSave, onCancel }: PropertyFormProps) => {
       <h2 className="text-2xl font-bold mb-6">
         {property ? 'עריכת נכס' : 'הוספת נכס חדש'}
       </h2>
+      
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
