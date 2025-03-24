@@ -33,20 +33,23 @@ export const updateProperty = async (property: PropertyProps): Promise<PropertyP
   const propertyData = toSupabaseFormat(property);
 
   try {
-    // The key fix: Use single() instead of select() alone, which returns an array
     const { data, error } = await supabase
       .from('properties')
       .update(propertyData)
       .eq('id', property.id)
-      .select()
-      .single();
+      .select();
 
     if (error) {
       console.error(`Error updating property with ID ${property.id}:`, error);
       return null;
     }
     
-    return mapPropertyData(data);
+    if (!data || data.length === 0) {
+      console.error(`No data returned after updating property with ID ${property.id}`);
+      return null;
+    }
+    
+    return mapPropertyData(data[0]);
   } catch (error) {
     console.error(`Caught exception updating property with ID ${property.id}:`, error);
     return null;
