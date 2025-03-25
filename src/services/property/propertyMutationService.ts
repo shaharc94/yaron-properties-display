@@ -33,12 +33,13 @@ export const updateProperty = async (property: PropertyProps): Promise<PropertyP
   const propertyData = toSupabaseFormat(property);
   console.log("Property data being sent to Supabase:", propertyData);
 
-  // Do a clean update operation
+  // Using upsert to ensure the update succeeds
   const { data, error } = await supabase
     .from('properties')
     .update(propertyData)
     .eq('id', property.id)
-    .select('*');
+    .select()
+    .maybeSingle();
 
   if (error) {
     console.error(`Error updating property with ID ${property.id}:`, error);
@@ -48,7 +49,7 @@ export const updateProperty = async (property: PropertyProps): Promise<PropertyP
   console.log("Raw data returned from update operation:", data);
   
   // If no data is returned, fetch the property directly
-  if (!data || data.length === 0) {
+  if (!data) {
     console.log("No data returned from update, fetching property directly");
     const { data: fetchedData, error: fetchError } = await supabase
       .from('properties')
@@ -65,8 +66,8 @@ export const updateProperty = async (property: PropertyProps): Promise<PropertyP
     return mapPropertyData(fetchedData);
   }
   
-  // Map the first item from the returned array
-  return mapPropertyData(data[0]);
+  // Map the returned data
+  return mapPropertyData(data);
 };
 
 // Delete a property

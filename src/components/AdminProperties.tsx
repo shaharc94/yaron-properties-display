@@ -45,7 +45,8 @@ const AdminProperties = () => {
 
   const handleEdit = (property: PropertyProps) => {
     console.log("Editing property:", property);
-    const propertyCopy = JSON.parse(JSON.stringify(property)); // Deep copy
+    // Create a deep copy of the property object
+    const propertyCopy = JSON.parse(JSON.stringify(property));
     setEditingProperty(propertyCopy);
     setIsFormOpen(true);
   };
@@ -56,7 +57,8 @@ const AdminProperties = () => {
         const success = await deleteProperty(id);
         
         if (success) {
-          await loadProperties();
+          // Update the UI by removing the deleted property
+          setPropertiesList(propertiesList.filter(p => p.id !== id));
           
           toast({
             title: "הנכס נמחק בהצלחה",
@@ -79,14 +81,15 @@ const AdminProperties = () => {
   const handleSave = async (property: PropertyProps) => {
     console.log("Property saved:", property);
     
-    // Reset the form and reload data in a specific order to ensure UI consistency
+    // Reset form state
     setIsFormOpen(false);
-    setEditingProperty(null); 
+    setEditingProperty(null);
     
-    // Force reload of all properties after a short delay to ensure DB transaction is complete
+    // Force a complete reload of properties from the server
+    // Using a longer delay to ensure the database transaction is complete
     setTimeout(() => {
       loadProperties();
-    }, 500);
+    }, 1000);
   };
 
   if (loading && propertiesList.length === 0) {

@@ -86,22 +86,22 @@ const PropertyFormContainer = ({ property, onSave, onCancel }: PropertyFormProps
     }
     
     try {
+      // Create a complete, independent copy of the form data to prevent reference issues
+      const propertyToSave = JSON.parse(JSON.stringify(formData));
+      console.log("Before save - Property to save:", propertyToSave);
+      
       let savedProperty: PropertyProps | null;
       
-      // Deep clone the form data to prevent any reference issues
-      const propertyToSave = JSON.parse(JSON.stringify(formData));
-      
       if (property && property.id) {
-        // Ensure the ID is correctly set
+        // For updates, ensure we have the correct ID
         propertyToSave.id = property.id;
         
         console.log("Sending property update with ID:", propertyToSave.id);
-        console.log("Property data being sent:", propertyToSave);
         
         savedProperty = await updateProperty(propertyToSave);
+        console.log("Response from updateProperty:", savedProperty);
         
         if (savedProperty) {
-          console.log("Updated property received:", savedProperty);
           toast({
             title: "הנכס עודכן בהצלחה",
             description: "פרטי הנכס עודכנו בהצלחה במערכת",
@@ -112,8 +112,9 @@ const PropertyFormContainer = ({ property, onSave, onCancel }: PropertyFormProps
         }
       } else {
         savedProperty = await createProperty(propertyToSave);
+        console.log("Response from createProperty:", savedProperty);
+        
         if (savedProperty) {
-          console.log("Created property received:", savedProperty);
           toast({
             title: "הנכס נוסף בהצלחה",
             description: "הנכס החדש נוסף בהצלחה למערכת",
