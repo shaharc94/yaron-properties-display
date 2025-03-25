@@ -33,26 +33,36 @@ export const updateProperty = async (property: PropertyProps): Promise<PropertyP
   const propertyData = toSupabaseFormat(property);
 
   try {
-    // Fix: Use the maybeSingle() method to properly handle the response
-    // This ensures we don't get a 406 error and properly handle single/no results
     const { data, error } = await supabase
       .from('properties')
       .update(propertyData)
       .eq('id', property.id)
-      .select('*')
-      .maybeSingle();
+      .select();
 
     if (error) {
       console.error(`Error updating property with ID ${property.id}:`, error);
       return null;
     }
     
-    if (!data) {
+    if (!data || data.length === 0) {
       console.error(`No data returned after updating property with ID ${property.id}`);
-      return null;
+      // Despite no data being returned, the update might have succeeded
+      // Fetch the property data again to return to the caller
+      const { data: fetchedData, error: fetchError } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('id', property.id)
+        .single();
+        
+      if (fetchError) {
+        console.error(`Error fetching updated property with ID ${property.id}:`, fetchError);
+        return null;
+      }
+      
+      return mapPropertyData(fetchedData);
     }
     
-    return mapPropertyData(data);
+    return mapPropertyData(data[0]);
   } catch (error) {
     console.error(`Caught exception updating property with ID ${property.id}:`, error);
     return null;
