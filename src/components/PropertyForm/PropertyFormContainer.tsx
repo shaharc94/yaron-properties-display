@@ -88,16 +88,17 @@ const PropertyFormContainer = ({ property, onSave, onCancel }: PropertyFormProps
     try {
       let savedProperty: PropertyProps | null;
       
+      // Deep clone the form data to prevent any reference issues
+      const propertyToSave = JSON.parse(JSON.stringify(formData));
+      
       if (property && property.id) {
-        const propertyToUpdate = {
-          ...formData,
-          id: property.id
-        };
+        // Ensure the ID is correctly set
+        propertyToSave.id = property.id;
         
-        console.log("Sending property update with ID:", propertyToUpdate.id);
-        console.log("Property data being sent:", propertyToUpdate);
+        console.log("Sending property update with ID:", propertyToSave.id);
+        console.log("Property data being sent:", propertyToSave);
         
-        savedProperty = await updateProperty(propertyToUpdate);
+        savedProperty = await updateProperty(propertyToSave);
         
         if (savedProperty) {
           console.log("Updated property received:", savedProperty);
@@ -110,7 +111,7 @@ const PropertyFormContainer = ({ property, onSave, onCancel }: PropertyFormProps
           throw new Error("Failed to update property");
         }
       } else {
-        savedProperty = await createProperty(formData);
+        savedProperty = await createProperty(propertyToSave);
         if (savedProperty) {
           console.log("Created property received:", savedProperty);
           toast({

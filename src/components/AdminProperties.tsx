@@ -79,11 +79,14 @@ const AdminProperties = () => {
   const handleSave = async (property: PropertyProps) => {
     console.log("Property saved:", property);
     
-    // טעינה מחדש של הנתונים מהשרת לאחר שמירה כדי לוודא שהממשק מעודכן
-    await loadProperties();
-    
+    // Reset the form and reload data in a specific order to ensure UI consistency
     setIsFormOpen(false);
-    setEditingProperty(null); // חשוב לאפס את העריכה הנוכחית
+    setEditingProperty(null); 
+    
+    // Force reload of all properties after a short delay to ensure DB transaction is complete
+    setTimeout(() => {
+      loadProperties();
+    }, 500);
   };
 
   if (loading && propertiesList.length === 0) {

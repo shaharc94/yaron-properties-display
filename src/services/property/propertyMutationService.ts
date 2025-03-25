@@ -33,44 +33,40 @@ export const updateProperty = async (property: PropertyProps): Promise<PropertyP
   const propertyData = toSupabaseFormat(property);
   console.log("Property data being sent to Supabase:", propertyData);
 
-  try {
-    const { data, error } = await supabase
-      .from('properties')
-      .update(propertyData)
-      .eq('id', property.id)
-      .select()
-      .single();
+  // Do a clean update operation
+  const { data, error } = await supabase
+    .from('properties')
+    .update(propertyData)
+    .eq('id', property.id)
+    .select('*');
 
-    if (error) {
-      console.error(`Error updating property with ID ${property.id}:`, error);
-      return null;
-    }
-    
-    console.log("Data returned from update operation:", data);
-    return mapPropertyData(data);
-    
-  } catch (error) {
-    console.error(`Caught exception updating property with ID ${property.id}:`, error);
-    
-    // במקרה של שגיאה, ננסה לקבל את הנתונים העדכניים
-    try {
-      const { data: fetchedData, error: fetchError } = await supabase
-        .from('properties')
-        .select('*')
-        .eq('id', property.id)
-        .single();
-        
-      if (fetchError) {
-        console.error(`Error fetching updated property with ID ${property.id}:`, fetchError);
-        return null;
-      }
-      
-      return mapPropertyData(fetchedData);
-    } catch (secondError) {
-      console.error("Error fetching after update failure:", secondError);
-      return null;
-    }
+  if (error) {
+    console.error(`Error updating property with ID ${property.id}:`, error);
+    return null;
   }
+  
+  console.log("Raw data returned from update operation:", data);
+  
+  // If no data is returned, fetch the property directly
+  if (!data || data.length === 0) {
+    console.log("No data returned from update, fetching property directly");
+    const { data: fetchedData, error: fetchError } = await supabase
+      .from('properties')
+      .select('*')
+      .eq('id', property.id)
+      .single();
+      
+    if (fetchError) {
+      console.error(`Error fetching updated property with ID ${property.id}:`, fetchError);
+      return null;
+    }
+    
+    console.log("Fetched property data after update:", fetchedData);
+    return mapPropertyData(fetchedData);
+  }
+  
+  // Map the first item from the returned array
+  return mapPropertyData(data[0]);
 };
 
 // Delete a property
