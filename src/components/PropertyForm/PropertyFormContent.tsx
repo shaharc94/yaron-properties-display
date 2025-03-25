@@ -115,8 +115,10 @@ const PropertyFormContent = ({ formData, handleChange }: PropertyFormContentProp
           name="imageUrl"
           value={formData.imageUrl}
           onChange={handleChange}
+          placeholder="https://example.com/image.jpg"
           required
         />
+        <p className="text-sm text-gray-500">יש להזין כתובת URL מלאה המתחילה ב-https://</p>
       </div>
       
       {formData.imageUrl && <PropertyImagePreview imageUrl={formData.imageUrl} />}

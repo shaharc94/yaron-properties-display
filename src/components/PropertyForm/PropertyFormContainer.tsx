@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { PropertyProps } from "../PropertyCard";
@@ -56,16 +55,39 @@ const PropertyFormContainer = ({ property, onSave, onCancel }: PropertyFormProps
     }
   };
 
+  const validateImageUrl = (url: string): string => {
+    if (!url) return "נדרשת כתובת URL לתמונה";
+    
+    if (url.startsWith('http://') || url.startsWith('https://')) return "";
+    
+    if (url.startsWith('?') || url.startsWith('&')) {
+      return "כתובת URL לא תקינה. נדרשת כתובת מלאה המתחילה ב-https://";
+    }
+    
+    return "";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     
+    const imageUrlError = validateImageUrl(formData.imageUrl);
+    if (imageUrlError) {
+      setError(imageUrlError);
+      setLoading(false);
+      toast({
+        title: "שגיאה בשמירת הנכס",
+        description: imageUrlError,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
       let savedProperty: PropertyProps | null;
       
       if (property && property.id) {
-        // Ensure we're sending the correct property ID
         const propertyToUpdate = {
           ...formData,
           id: property.id
