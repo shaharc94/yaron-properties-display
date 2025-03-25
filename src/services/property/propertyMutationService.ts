@@ -31,23 +31,29 @@ export const updateProperty = async (property: PropertyProps): Promise<PropertyP
   }
 
   const propertyData = toSupabaseFormat(property);
+  console.log("Property data being sent to Supabase:", propertyData);
 
   try {
     const { data, error } = await supabase
       .from('properties')
       .update(propertyData)
       .eq('id', property.id)
-      .select();
+      .select()
+      .single();
 
     if (error) {
       console.error(`Error updating property with ID ${property.id}:`, error);
       return null;
     }
     
-    if (!data || data.length === 0) {
-      console.error(`No data returned after updating property with ID ${property.id}`);
-      // Despite no data being returned, the update might have succeeded
-      // Fetch the property data again to return to the caller
+    console.log("Data returned from update operation:", data);
+    return mapPropertyData(data);
+    
+  } catch (error) {
+    console.error(`Caught exception updating property with ID ${property.id}:`, error);
+    
+    // במקרה של שגיאה, ננסה לקבל את הנתונים העדכניים
+    try {
       const { data: fetchedData, error: fetchError } = await supabase
         .from('properties')
         .select('*')
@@ -60,12 +66,10 @@ export const updateProperty = async (property: PropertyProps): Promise<PropertyP
       }
       
       return mapPropertyData(fetchedData);
+    } catch (secondError) {
+      console.error("Error fetching after update failure:", secondError);
+      return null;
     }
-    
-    return mapPropertyData(data[0]);
-  } catch (error) {
-    console.error(`Caught exception updating property with ID ${property.id}:`, error);
-    return null;
   }
 };
 

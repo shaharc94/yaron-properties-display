@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -77,8 +78,12 @@ const AdminProperties = () => {
 
   const handleSave = async (property: PropertyProps) => {
     console.log("Property saved:", property);
+    
+    // טעינה מחדש של הנתונים מהשרת לאחר שמירה כדי לוודא שהממשק מעודכן
     await loadProperties();
+    
     setIsFormOpen(false);
+    setEditingProperty(null); // חשוב לאפס את העריכה הנוכחית
   };
 
   if (loading && propertiesList.length === 0) {

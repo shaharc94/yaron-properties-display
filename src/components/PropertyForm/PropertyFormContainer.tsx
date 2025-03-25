@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { PropertyProps } from "../PropertyCard";
@@ -64,7 +65,7 @@ const PropertyFormContainer = ({ property, onSave, onCancel }: PropertyFormProps
       return "כתובת URL לא תקינה. נדרשת כתובת מלאה המתחילה ב-https://";
     }
     
-    return "";
+    return "כתובת URL לא תקינה. נדרשת כתובת מלאה המתחילה ב-https://";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -94,9 +95,12 @@ const PropertyFormContainer = ({ property, onSave, onCancel }: PropertyFormProps
         };
         
         console.log("Sending property update with ID:", propertyToUpdate.id);
+        console.log("Property data being sent:", propertyToUpdate);
+        
         savedProperty = await updateProperty(propertyToUpdate);
         
         if (savedProperty) {
+          console.log("Updated property received:", savedProperty);
           toast({
             title: "הנכס עודכן בהצלחה",
             description: "פרטי הנכס עודכנו בהצלחה במערכת",
@@ -108,6 +112,7 @@ const PropertyFormContainer = ({ property, onSave, onCancel }: PropertyFormProps
       } else {
         savedProperty = await createProperty(formData);
         if (savedProperty) {
+          console.log("Created property received:", savedProperty);
           toast({
             title: "הנכס נוסף בהצלחה",
             description: "הנכס החדש נוסף בהצלחה למערכת",
