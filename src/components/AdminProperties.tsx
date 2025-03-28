@@ -86,6 +86,9 @@ const AdminProperties = () => {
       setPropertiesList(prev => 
         prev.map(p => p.id === property.id ? property : p)
       );
+    } else {
+      // If this is a new property, add it to the list
+      setPropertiesList(prev => [...prev, property]);
     }
     
     // Reset form state
@@ -96,7 +99,7 @@ const AdminProperties = () => {
     // Using a longer delay to ensure the database transaction is complete
     setTimeout(() => {
       loadProperties();
-    }, 1500);
+    }, 2000);
   };
 
   if (loading && propertiesList.length === 0) {

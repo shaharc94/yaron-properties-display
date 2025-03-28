@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { PropertyProps } from "../PropertyCard";
@@ -32,7 +31,7 @@ const PropertyFormContainer = ({ property, onSave, onCancel }: PropertyFormProps
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<PropertyProps>(
-    property ? { ...property } : { ...emptyProperty }
+    property ? JSON.parse(JSON.stringify(property)) : { ...emptyProperty }
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -86,14 +85,12 @@ const PropertyFormContainer = ({ property, onSave, onCancel }: PropertyFormProps
     }
     
     try {
-      // Create a complete, independent copy of the form data to prevent reference issues
       const propertyToSave = JSON.parse(JSON.stringify(formData));
       console.log("Before save - Property to save:", propertyToSave);
       
       let savedProperty: PropertyProps | null;
       
       if (property && property.id) {
-        // For updates, ensure we have the correct ID
         propertyToSave.id = property.id;
         
         console.log("Sending property update with ID:", propertyToSave.id);
@@ -102,7 +99,6 @@ const PropertyFormContainer = ({ property, onSave, onCancel }: PropertyFormProps
         console.log("Response from updateProperty:", savedProperty);
         
         if (savedProperty) {
-          // Update the form data with the saved property to ensure UI reflects changes
           setFormData(savedProperty);
           
           toast({
