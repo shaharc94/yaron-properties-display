@@ -17,12 +17,31 @@ const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Check for existing admin session in localStorage
+  // Check for existing admin session in localStorage and authenticate with Supabase
   useEffect(() => {
     const adminAuth = localStorage.getItem('adminAuth');
     if (adminAuth === 'true') {
       setAuthenticated(true);
       setIsAccessDialogOpen(false);
+      
+      // Sign in anonymously with Supabase for API access
+      const signInAnonymously = async () => {
+        try {
+          // Use anonymous sign-in or a service role key
+          const { error } = await supabase.auth.signInWithPassword({
+            email: 'admin@example.com',
+            password: 'admin123', // This should be a secure password in a real app
+          });
+          
+          if (error) {
+            console.error("Supabase anonymous sign-in error:", error);
+          }
+        } catch (error) {
+          console.error("Error authenticating with Supabase:", error);
+        }
+      };
+      
+      signInAnonymously();
     }
   }, []);
 
@@ -32,6 +51,16 @@ const Admin = () => {
       setAuthenticating(true);
       
       try {
+        // Authenticate with Supabase
+        const { error } = await supabase.auth.signInWithPassword({
+          email: 'admin@example.com',
+          password: 'admin123', // This should be a secure password in a real app
+        });
+        
+        if (error) {
+          throw error;
+        }
+        
         // Store admin authentication state in localStorage
         localStorage.setItem('adminAuth', 'true');
         setAuthenticated(true);
@@ -71,7 +100,10 @@ const Admin = () => {
     }
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    // Sign out of Supabase
+    await supabase.auth.signOut();
+    
     // Clear admin authentication from localStorage
     localStorage.removeItem('adminAuth');
     setAuthenticated(false);
