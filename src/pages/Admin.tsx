@@ -17,32 +17,13 @@ const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Check if we have an active session when the component mounts
+  // Check for existing admin session in localStorage
   useEffect(() => {
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        setAuthenticated(true);
-        setIsAccessDialogOpen(false);
-      }
-    };
-    
-    checkSession();
-
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session) {
-          setAuthenticated(true);
-          setIsAccessDialogOpen(false);
-        } else {
-          setAuthenticated(false);
-          setIsAccessDialogOpen(true);
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
+    const adminAuth = localStorage.getItem('adminAuth');
+    if (adminAuth === 'true') {
+      setAuthenticated(true);
+      setIsAccessDialogOpen(false);
+    }
   }, []);
 
   const handlePasswordSubmit = async () => {
@@ -51,26 +32,17 @@ const Admin = () => {
       setAuthenticating(true);
       
       try {
-        // For simplicity, we're using email password auth with a predefined admin account
-        // In a real app, you'd want to use a more secure authentication method
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: "admin@example.com",
-          password: password
-        });
+        // Store admin authentication state in localStorage
+        localStorage.setItem('adminAuth', 'true');
+        setAuthenticated(true);
+        setIsAccessDialogOpen(false);
         
-        if (error) {
-          console.error("Authentication error:", error);
-          toast({
-            title: "שגיאת התחברות",
-            description: "אירעה שגיאה בהתחברות. נסה שוב מאוחר יותר.",
-            variant: "destructive",
-          });
-        } else {
-          setAuthenticated(true);
-          setIsAccessDialogOpen(false);
-        }
+        toast({
+          title: "התחברות בוצעה בהצלחה",
+          description: "ברוך הבא לממשק הניהול",
+        });
       } catch (error) {
-        console.error("Sign in error:", error);
+        console.error("Login error:", error);
         toast({
           title: "שגיאת התחברות",
           description: "אירעה שגיאה בהתחברות. נסה שוב מאוחר יותר.",
@@ -99,10 +71,16 @@ const Admin = () => {
     }
   };
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
+  const handleSignOut = () => {
+    // Clear admin authentication from localStorage
+    localStorage.removeItem('adminAuth');
     setAuthenticated(false);
     setIsAccessDialogOpen(true);
+    
+    toast({
+      title: "התנתקות בוצעה בהצלחה",
+      description: "התנתקת בהצלחה מממשק הניהול",
+    });
   };
 
   return (
