@@ -81,6 +81,13 @@ const AdminProperties = () => {
   const handleSave = async (property: PropertyProps) => {
     console.log("Property saved:", property);
     
+    // Update the property in the local list immediately to reflect changes
+    if (property.id) {
+      setPropertiesList(prev => 
+        prev.map(p => p.id === property.id ? property : p)
+      );
+    }
+    
     // Reset form state
     setIsFormOpen(false);
     setEditingProperty(null);
@@ -89,7 +96,7 @@ const AdminProperties = () => {
     // Using a longer delay to ensure the database transaction is complete
     setTimeout(() => {
       loadProperties();
-    }, 1000);
+    }, 1500);
   };
 
   if (loading && propertiesList.length === 0) {

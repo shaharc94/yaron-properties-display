@@ -102,6 +102,9 @@ const PropertyFormContainer = ({ property, onSave, onCancel }: PropertyFormProps
         console.log("Response from updateProperty:", savedProperty);
         
         if (savedProperty) {
+          // Update the form data with the saved property to ensure UI reflects changes
+          setFormData(savedProperty);
+          
           toast({
             title: "הנכס עודכן בהצלחה",
             description: "פרטי הנכס עודכנו בהצלחה במערכת",
