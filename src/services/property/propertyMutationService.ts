@@ -7,18 +7,23 @@ import { PropertyData, mapPropertyData, toSupabaseFormat } from "./propertyBaseS
 export const createProperty = async (property: PropertyData): Promise<PropertyProps | null> => {
   const propertyData = toSupabaseFormat(property);
 
-  const { data, error } = await supabase
-    .from('properties')
-    .insert(propertyData)
-    .select()
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from('properties')
+      .insert(propertyData)
+      .select()
+      .single();
 
-  if (error) {
+    if (error) {
+      console.error('Error creating property:', error);
+      return null;
+    }
+
+    return mapPropertyData(data);
+  } catch (error) {
     console.error('Error creating property:', error);
     return null;
   }
-
-  return mapPropertyData(data);
 };
 
 // Update an existing property
@@ -33,56 +38,66 @@ export const updateProperty = async (property: PropertyProps): Promise<PropertyP
   const propertyData = toSupabaseFormat(property);
   console.log("Property data being sent to Supabase:", propertyData);
 
-  // Use upsert instead of update for more reliable handling
-  const { data, error } = await supabase
-    .from('properties')
-    .upsert({ ...propertyData, id: property.id })
-    .select('*')
-    .maybeSingle();
-
-  if (error) {
-    console.error(`Error updating property with ID ${property.id}:`, error);
-    return null;
-  }
-  
-  console.log("Raw data returned from update operation:", data);
-  
-  if (!data) {
-    console.error("No data returned from update operation");
-    // Try to fetch the property directly if the update didn't return data
-    const { data: fetchedData, error: fetchError } = await supabase
+  try {
+    // Use upsert instead of update for more reliable handling
+    const { data, error } = await supabase
       .from('properties')
+      .upsert({ ...propertyData, id: property.id })
       .select('*')
-      .eq('id', property.id)
       .maybeSingle();
-      
-    if (fetchError || !fetchedData) {
-      console.error(`Error fetching updated property with ID ${property.id}:`, fetchError);
+
+    if (error) {
+      console.error(`Error updating property with ID ${property.id}:`, error);
       return null;
     }
     
-    const mappedData = mapPropertyData(fetchedData);
-    console.log("Fetched property data after update:", mappedData);
+    console.log("Raw data returned from update operation:", data);
+    
+    if (!data) {
+      console.error("No data returned from update operation");
+      // Try to fetch the property directly if the update didn't return data
+      const { data: fetchedData, error: fetchError } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('id', property.id)
+        .maybeSingle();
+        
+      if (fetchError || !fetchedData) {
+        console.error(`Error fetching updated property with ID ${property.id}:`, fetchError);
+        return null;
+      }
+      
+      const mappedData = mapPropertyData(fetchedData);
+      console.log("Fetched property data after update:", mappedData);
+      return mappedData;
+    }
+    
+    // Map the returned data
+    const mappedData = mapPropertyData(data);
+    console.log("Mapped data after update:", mappedData);
     return mappedData;
+  } catch (error) {
+    console.error(`Error updating property with ID ${property.id}:`, error);
+    return null;
   }
-  
-  // Map the returned data
-  const mappedData = mapPropertyData(data);
-  console.log("Mapped data after update:", mappedData);
-  return mappedData;
 };
 
 // Delete a property
 export const deleteProperty = async (id: number): Promise<boolean> => {
-  const { error } = await supabase
-    .from('properties')
-    .delete()
-    .eq('id', id);
+  try {
+    const { error } = await supabase
+      .from('properties')
+      .delete()
+      .eq('id', id);
 
-  if (error) {
+    if (error) {
+      console.error(`Error deleting property with ID ${id}:`, error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
     console.error(`Error deleting property with ID ${id}:`, error);
     return false;
   }
-
-  return true;
 };
